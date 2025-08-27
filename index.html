@@ -252,7 +252,7 @@
         const INITIAL_CONFIG = {
             schoolName: "Collège [NOM DE VOTRE ÉTABLISSEMENT]", // Changez le nom ici
             referentEmails: [
-                "didierboivin81@gmail.com",
+                "referent1@email.com",
                 "referent2@email.com",
                 "referent3@email.com",
                 "referent4@email.com",
@@ -388,11 +388,6 @@
             const studentClass = document.getElementById('studentClass').value;
             const tempPassword = document.getElementById('studentTempPassword').value.trim();
 
-            // --- DEBOGAGE ---
-            console.log("Données saisies pour la connexion :", { id: studentId, classe: studentClass, mdp: tempPassword });
-            console.log("Liste d'élèves actuelle :", JSON.stringify(studentsList, null, 2));
-            // --- FIN DEBOGAGE ---
-
             // Vérifier dans la liste des élèves avec le mot de passe provisoire (première connexion)
             const student = studentsList.find(s => 
                 s.id.toLowerCase() === studentId && 
@@ -505,10 +500,14 @@ Ceci est un message automatique généré par l'application Anti-Harcèlement.
                 `.trim();
 
                 const mailtoLink = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                
+                alert('Signalement envoyé ! Votre application d\'email va s\'ouvrir pour que vous puissiez envoyer le rapport. N\'oubliez pas d\'appuyer sur \'Envoyer\'.');
+                
                 window.location.href = mailtoLink;
+            } else {
+                alert('Aucune adresse email de référent n\'a été configurée. Le signalement ne peut pas être envoyé.');
             }
 
-            alert('Signalement envoyé ! Votre application d\'email va s\'ouvrir. N\'oubliez pas d\'appuyer sur \'Envoyer\'.');
             document.getElementById('reportForm').reset();
             studentLogout(); // Déconnexion après envoi
         }
@@ -592,7 +591,5 @@ Ceci est un message automatique généré par l'application Anti-Harcèlement.
             return password;
         }
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-    <script>eruda.init();</script>
 <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97282c92b7112a19',t:'MTc1NTc1ODc5NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
