@@ -388,6 +388,11 @@
             const studentClass = document.getElementById('studentClass').value;
             const tempPassword = document.getElementById('studentTempPassword').value.trim();
 
+            // --- DEBOGAGE ---
+            console.log("Données saisies pour la connexion :", { id: studentId, classe: studentClass, mdp: tempPassword });
+            console.log("Liste d'élèves actuelle :", JSON.stringify(studentsList, null, 2));
+            // --- FIN DEBOGAGE ---
+
             // Vérifier dans la liste des élèves avec le mot de passe provisoire (première connexion)
             const student = studentsList.find(s => 
                 s.id.toLowerCase() === studentId && 
