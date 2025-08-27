@@ -55,6 +55,10 @@
                     </button>
                 </div>
             </div>
+
+            <footer class="text-center mt-4 pb-4">
+                <a href="#" onclick="resetApplication(event)" class="text-xs text-gray-300 hover:text-white">Réinitialiser l'application (pour test)</a>
+            </footer>
         </div>
 
         <!-- Page de connexion élève -->
@@ -582,6 +586,16 @@ Ceci est un message automatique généré par l'application Anti-Harcèlement.
         }
 
         // Utilitaires
+        function resetApplication(event) {
+            event.preventDefault();
+            const confirmation = confirm("⚠️ Êtes-vous sûr de vouloir réinitialiser complètement l'application ?\n\nCette action effacera TOUTES les données, y compris les mots de passe secrets des élèves. C'est utile pour les tests, mais ne doit pas être fait en utilisation normale.");
+            if (confirmation) {
+                localStorage.clear();
+                alert("L'application a été réinitialisée.");
+                location.reload();
+            }
+        }
+
         function generatePassword() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
             let password = '';
