@@ -376,23 +376,25 @@
 
         // Navigation
         function showHome() {
-            hideAllPages();
-            document.getElementById('homePage').classList.remove('hidden');
+            showPage('homePage');
         }
 
-        function showStudentLogin() {
-            hideAllPages();
-            document.getElementById('studentLoginPage').classList.remove('hidden');
-        }
-
-        function hideAllPages() {
+        function showPage(pageIdToShow) {
             const pages = ['homePage', 'studentLoginPage', 'studentReportPage'];
             pages.forEach(pageId => {
                 const page = document.getElementById(pageId);
                 if (page) {
-                    page.classList.add('hidden');
+                    if (pageId === pageIdToShow) {
+                        page.classList.remove('hidden');
+                    } else {
+                        page.classList.add('hidden');
+                    }
                 }
             });
+        }
+
+        function showStudentLogin() {
+            showPage('studentLoginPage');
         }
 
         function populateRememberedCredentials() {
@@ -410,18 +412,39 @@
         function handleStudentLogin() {
             const studentId = document.getElementById('studentId').value.trim().toLowerCase();
             const studentClass = document.getElementById('studentClass').value;
-            const tempPassword = document.getElementById('studentTempPassword').value.trim();
-
-            // Vérifier dans la liste des élèves avec le mot de passe provisoire (première connexion)
-            const student = studentsList.find(s => 
-                s.id.toLowerCase() === studentId && 
-                s.class === studentClass && 
-                s.tempPassword === tempPassword
-            );
-
+            const enteredPassword = document.getElementById('studentTempPassword').value.trim(); // Rename for clarity
             const rememberMe = document.getElementById('rememberMe').checked;
 
-            if (student && !student.password) {
+            // 1. Check for a returning user with a personal password
+            let student = studentsList.find(s =>
+                s.id.toLowerCase() === studentId &&
+                s.class === studentClass &&
+                s.password === enteredPassword
+            );
+
+            if (student) {
+                // Connexion réussie avec le mot de passe personnel
+                currentUser = student;
+                if (rememberMe) {
+                    localStorage.setItem('rememberedStudentId', studentId);
+                    localStorage.setItem('rememberedStudentClass', studentClass);
+                } else {
+                    localStorage.removeItem('rememberedStudentId');
+                    localStorage.removeItem('rememberedStudentClass');
+                }
+                showPage('studentReportPage');
+                return; // Important: exit function
+            }
+
+            // 2. If not found, check for a first-time user with a temporary password
+            student = studentsList.find(s =>
+                s.id.toLowerCase() === studentId &&
+                s.class === studentClass &&
+                !s.password && // Make sure a personal password isn't already set
+                s.tempPassword === enteredPassword
+            );
+
+            if (student) {
                 // PREMIÈRE CONNEXION : L'utilisateur doit choisir un mot de passe
                 currentUser = student; // Stocker temporairement l'étudiant
                 if (rememberMe) {
@@ -432,39 +455,19 @@
                     localStorage.removeItem('rememberedStudentClass');
                 }
                 showPasswordModal();
-            } else {
-                // Vérifier si l'élève essaie de se connecter avec son mot de passe personnel (connexions suivantes)
-                const studentWithPassword = studentsList.find(s => 
-                    s.id.toLowerCase() === studentId && 
-                    s.class === studentClass && 
-                    s.password === tempPassword
-                );
-                
-                if (studentWithPassword) {
-                    // Connexion réussie avec le mot de passe personnel
-                    currentUser = studentWithPassword;
-                    if (rememberMe) {
-                        localStorage.setItem('rememberedStudentId', studentId);
-                        localStorage.setItem('rememberedStudentClass', studentClass);
-                    } else {
-                        localStorage.removeItem('rememberedStudentId');
-                        localStorage.removeItem('rememberedStudentClass');
-                    }
-                    hideAllPages();
-                    document.getElementById('studentReportPage').classList.remove('hidden');
-                } else {
-                    // Identifiants incorrects
-                    alert('❌ CONNEXION ÉCHOUÉE\n\n' +
-                          'Vérifiez attentivement :\n' +
-                          '• Votre identifiant (format: nom.prenom)\n' +
-                          '• Votre classe\n' +
-                          '• Votre mot de passe\n\n' +
-                          '🔑 RAPPEL :\n' +
-                          '• PREMIÈRE connexion : utilisez le mot de passe provisoire\n' +
-                          '• Connexions suivantes : utilisez votre mot de passe personnel\n\n' +
-                          '❓ Si vous avez oublié votre mot de passe personnel, contactez le référent Phare.');
-                }
+                return; // Important: exit function
             }
+
+            // 3. If neither check passes, it's a failure
+            alert('❌ CONNEXION ÉCHOUÉE\n\n' +
+                  'Vérifiez attentivement :\n' +
+                  '• Votre identifiant (format: nom.prenom)\n' +
+                  '• Votre classe\n' +
+                  '• Votre mot de passe\n\n' +
+                  '🔑 RAPPEL :\n' +
+                  '• PREMIÈRE connexion : utilisez le mot de passe provisoire\n' +
+                  '• Connexions suivantes : utilisez votre mot de passe personnel\n\n' +
+                  '❓ Si vous avez oublié votre mot de passe personnel, contactez le référent Phare.');
         }
 
         function handleSetPassword() {
@@ -572,7 +575,7 @@ Ceci est un message automatique généré par l'application Anti-Harcèlement.
         // Déconnexions
         function studentLogout() {
             currentUser = null;
-            showHome();
+            showPage('homePage');
         }
 
         // Gestion de la popup de mot de passe
@@ -586,8 +589,7 @@ Ceci est un message automatique généré par l'application Anti-Harcèlement.
             currentUser = null;
             // Réinitialiser le formulaire de connexion
             document.getElementById('studentLoginForm').reset();
-            hideAllPages();
-            document.getElementById('studentLoginPage').classList.remove('hidden');
+            showPage('studentLoginPage');
         }
 
         function togglePasswordVisibility(fieldId, toggleElement) {
